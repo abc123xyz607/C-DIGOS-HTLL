@@ -1,0 +1,260 @@
+<html><head><base href="https://websimcreationengine.com/projects/calculadora-magica/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Mágica de Signos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #90EE90;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #8B0000;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 18px;
+            line-height: 1.4;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 10px;
+            width: 90vw;
+            height: 90vw;
+            max-width: 600px;
+            max-height: 600px;
+            background-color: #FFFFFF;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .quadrant {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .purple { background-color: #DDA0DD; }
+        .darkblue { background-color: #00008B; }
+        .green { background-color: #008000; }
+        .red { background-color: #FF0000; }
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+        }
+        .key, #reset {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .key:hover, #reset:hover {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input, #weekday, #age {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+            background-color: rgba(255,255,255,0.8);
+        }
+        #birthdate {
+            font-weight: bold;
+            color: #4B0082;
+        }
+        h2 {
+            color: #FFFFFF;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        #weekday, #age {
+            font-weight: bold;
+            color: #4B0082;
+        }
+        .zodiac-display {
+            background-color: #FF00FF;
+            color: #FFFFFF;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            text-align: left;
+            font-weight: bold;
+            max-width: 600px;
+            width: 90vw;
+        }
+        .zodiac-display h2 {
+            margin-bottom: 10px;
+        }
+        .zodiac-display p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>CALCULADORA MÁGICA PROF.: ASSIS COSTA DIGITE O DIA - MÊS - ANO<br>PARA DESCOBRIR SEU SIGNO E CARACTERÍSTICAS.</h1>
+    <div class="container">
+        <div class="quadrant purple">
+            <input type="text" id="birthdate" readonly placeholder="DIA - MÊS - ANO">
+        </div>
+        <div class="quadrant darkblue">
+            <div class="keypad">
+                <button class="key">1</button>
+                <button class="key">2</button>
+                <button class="key">3</button>
+                <button class="key">4</button>
+                <button class="key">5</button>
+                <button class="key">6</button>
+                <button class="key">7</button>
+                <button class="key">8</button>
+                <button class="key">9</button>
+                <button class="key">0</button>
+                <button id="reset">C</button>
+            </div>
+        </div>
+        <div class="quadrant green">
+            <h2>QUAL DIA DA SEMANA VOCÊ NASCEU?</h2>
+            <input type="text" id="weekday" readonly>
+        </div>
+        <div class="quadrant red">
+            <h2>SUA IDADE</h2>
+            <input type="text" id="age" readonly>
+        </div>
+    </div>
+    <div class="zodiac-display">
+        <h2>SEU SIGNO</h2>
+        <p id="zodiacSign"></p>
+        <p id="element"></p>
+        <p id="regent"></p>
+        <p id="characteristics"></p>
+    </div>
+
+    <script>
+        const birthdate = document.getElementById('birthdate');
+        const weekday = document.getElementById('weekday');
+        const age = document.getElementById('age');
+        const zodiacSign = document.getElementById('zodiacSign');
+        const element = document.getElementById('element');
+        const regent = document.getElementById('regent');
+        const characteristics = document.getElementById('characteristics');
+        const keys = document.querySelectorAll('.key');
+        const reset = document.getElementById('reset');
+
+        let currentInput = '';
+
+        const zodiacData = {
+            'Capricórnio': { dates: [[12, 22], [1, 19]], element: 'Terra', regent: 'Saturno', characteristics: 'Ambicioso, disciplinado, responsável, prático, paciente' },
+            'Aquário': { dates: [[1, 20], [2, 18]], element: 'Ar', regent: 'Urano', characteristics: 'Independente, original, humanitário, inovador, intelectual' },
+            'Peixes': { dates: [[2, 19], [3, 20]], element: 'Água', regent: 'Netuno', characteristics: 'Compassivo, intuitivo, sonhador, artístico, sentimental' },
+            'Áries': { dates: [[3, 21], [4, 19]], element: 'Fogo', regent: 'Marte', characteristics: 'Energético, corajoso, impulsivo, competitivo, independente' },
+            'Touro': { dates: [[4, 20], [5, 20]], element: 'Terra', regent: 'Vênus', characteristics: 'Prático, paciente, sensual, leal, dedicado' },
+            'Gêmeos': { dates: [[5, 21], [6, 20]], element: 'Ar', regent: 'Mercúrio', characteristics: 'Comunicativo, inteligente, versátil, curioso, sociável' },
+            'Câncer': { dates: [[6, 21], [7, 22]], element: 'Água', regent: 'Lua', characteristics: 'Emotivo, intuitivo, protetor, leal, sensível' },
+            'Leão': { dates: [[7, 23], [8, 22]], element: 'Fogo', regent: 'Sol', characteristics: 'Confiante, generoso, criativo, dramático, charmoso' },
+            'Virgem': { dates: [[8, 23], [9, 22]], element: 'Terra', regent: 'Mercúrio', characteristics: 'Prático, analítico, organizado, crítico, perfeccionista' },
+            'Libra': { dates: [[9, 23], [10, 22]], element: 'Ar', regent: 'Vênus', characteristics: 'Justo, diplomático, harmonioso, romântico, social' },
+            'Escorpião': { dates: [[10, 23], [11, 21]], element: 'Água', regent: 'Plutão e Marte', characteristics: 'Intenso, apaixonado, misterioso, determinado, leal' },
+            'Sagitário': { dates: [[11, 22], [12, 21]], element: 'Fogo', regent: 'Júpiter', characteristics: 'Otimista, aventureiro, independente, honesto, filosófico' }
+        };
+
+        keys.forEach(key => {
+            key.addEventListener('click', () => {
+                if (currentInput.length < 8) {
+                    currentInput += key.textContent;
+                    updateDisplay();
+                }
+            });
+        });
+
+        reset.addEventListener('click', () => {
+            currentInput = '';
+            updateDisplay();
+            weekday.value = '';
+            age.value = '';
+            zodiacSign.textContent = '';
+            element.textContent = '';
+            regent.textContent = '';
+            characteristics.textContent = '';
+        });
+
+        function updateDisplay() {
+            let formatted = '';
+            if (currentInput.length > 0) formatted += currentInput.slice(0, 2);
+            if (currentInput.length > 2) formatted += ' - ' + currentInput.slice(2, 4);
+            if (currentInput.length > 4) formatted += ' - ' + currentInput.slice(4);
+            birthdate.value = formatted;
+
+            if (currentInput.length === 8) {
+                calculateWeekdayAndAge();
+                calculateZodiacSign();
+                speakResult();
+            }
+        }
+
+        function calculateWeekdayAndAge() {
+            const day = parseInt(currentInput.slice(0, 2));
+            const month = parseInt(currentInput.slice(2, 4)) - 1;
+            const year = parseInt(currentInput.slice(4));
+
+            const date = new Date(year, month, day);
+            const weekdays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            weekday.value = weekdays[date.getDay()];
+
+            const today = new Date();
+            let calculatedAge = today.getFullYear() - year;
+            const m = today.getMonth() - month;
+            if (m < 0 || (m === 0 && today.getDate() < day)) {
+                calculatedAge--;
+            }
+            age.value = `SUA IDADE É ${calculatedAge} ANOS`;
+        }
+
+        function calculateZodiacSign() {
+            const day = parseInt(currentInput.slice(0, 2));
+            const month = parseInt(currentInput.slice(2, 4));
+
+            for (const [sign, data] of Object.entries(zodiacData)) {
+                const [[startMonth, startDay], [endMonth, endDay]] = data.dates;
+                if ((month === startMonth && day >= startDay) || (month === endMonth && day <= endDay)) {
+                    zodiacSign.textContent = `Signo: ${sign}`;
+                    element.textContent = `Elemento: ${data.element}`;
+                    regent.textContent = `Regente: ${data.regent}`;
+                    characteristics.textContent = `Características: ${data.characteristics}`;
+                    break;
+                }
+            }
+        }
+
+        function speakResult() {
+            if ('speechSynthesis' in window) {
+                const text = `Você nasceu em ${birthdate.value}. O dia da semana era ${weekday.value}. ${age.value}. ${zodiacSign.textContent}. ${element.textContent}. ${regent.textContent}. ${characteristics.textContent}`;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'pt-BR';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+</body>
+</html>

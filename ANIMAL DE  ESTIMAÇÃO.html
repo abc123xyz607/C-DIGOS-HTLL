@@ -1,0 +1,151 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Adivinhação de Figuras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        #gameBoard {
+            width: 300px;
+            height: 300px;
+            background-color: #ffffff;
+            border: 2px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 100px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        #input {
+            width: 290px;
+            padding: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        #submitBtn {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #submitBtn:hover {
+            background-color: #45a049;
+        }
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameBoard"></div>
+    <input type="text" id="input" placeholder="Digite o nome da figura">
+    <button id="submitBtn">Enviar</button>
+    <table>
+        <tr>
+            <th>Jogador</th>
+            <th>Pontuação</th>
+        </tr>
+        <tr>
+            <td>Jogador</td>
+            <td id="score">0</td>
+        </tr>
+    </table>
+
+    <script>
+        const gameBoard = document.getElementById('gameBoard');
+        const input = document.getElementById('input');
+        const submitBtn = document.getElementById('submitBtn');
+        const scoreElement = document.getElementById('score');
+
+        const figures = ['🐶', '🐱', '🐭', '🐰', '🐹', '🐢', '🐦', '🐕', '🐩', '🐕‍🦺', '🐈', '🐇', '🐖', '🐴', '🐺', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁'];
+        let currentFigure = '';
+        let score = 0;
+
+        function getRandomFigure() {
+            let newFigure;
+            do {
+                newFigure = figures[Math.floor(Math.random() * figures.length)];
+            } while (newFigure === currentFigure);
+            return newFigure;
+        }
+
+        function updateFigure() {
+            currentFigure = getRandomFigure();
+            gameBoard.textContent = currentFigure;
+        }
+
+        gameBoard.addEventListener('click', updateFigure);
+
+        submitBtn.addEventListener('click', checkAnswer);
+        input.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        function checkAnswer() {
+            const userAnswer = input.value.trim().toLowerCase();
+            const correctAnswer = getFigureName(currentFigure);
+
+            if (userAnswer === correctAnswer.toLowerCase()) {
+                score++;
+                scoreElement.textContent = score;
+                alert('Correto! Você ganhou um ponto.');
+            } else {
+                alert(`Incorreto. A resposta correta era: ${correctAnswer}`);
+            }
+
+            input.value = '';
+            updateFigure();
+        }
+
+        function getFigureName(figure) {
+            const figureNames = {
+                '🐶': 'Cachorro',
+                '🐱': 'Gato',
+                '🐭': 'Rato',
+                '🐰': 'Coelho',
+                '🐹': 'Hamster',
+                '🐢': 'Tartaruga',
+                '🐦': 'Pássaro',
+                '🐕': 'Cão',
+                '🐩': 'Poodle',
+                '🐕‍🦺': 'Cão-guia',
+                '🐈': 'Gato',
+                '🐇': 'Coelho',
+                '🐖': 'Porco',
+                '🐴': 'Cavalo',
+                '🐺': 'Lobo',
+                '🦊': 'Raposa',
+                '🐻': 'Urso',
+                '🐼': 'Panda',
+                '🐨': 'Coala',
+                '🐯': 'Tigre',
+                '🦁': 'Leão'
+            };
+            return figureNames[figure] || '';
+        }
+
+        updateFigure();
+    </script>
+</body></html>

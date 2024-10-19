@@ -1,0 +1,204 @@
+<html><head><base href="https://game.websim.engine/wordsearch/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caça Palavras dos Professores</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+  }
+  
+  #game-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 20px;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  #word-grid {
+    display: grid;
+    grid-template-columns: repeat(15, 30px);
+    gap: 2px;
+    margin-bottom: 20px;
+  }
+
+  .letter {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .letter.selected {
+    background-color: #ffff99;
+  }
+
+  .letter.correct {
+    background-color: #99ff99;
+  }
+
+  #word-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .word-item {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+  }
+
+  .word-item.found {
+    background-color: #99ff99;
+    text-decoration: line-through;
+  }
+
+  #score {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="score">Pontuação: <span id="score-value">0</span></div>
+  <div id="word-grid"></div>
+  <div id="word-list"></div>
+</div>
+
+<script>
+const words = [
+  'AMANDA', 'ANAJARA', 'ASSIS', 'CLEANE', 'EDILEUZA',
+  'IOLANDA', 'ZEZINHO', 'MARIO', 'REGINALDO', 'RONALDO',
+  'ROZANGELA', 'TICIANE'
+];
+
+const grid = [
+  ['A', 'M', 'A', 'N', 'D', 'A', 'S', 'S', 'I', 'S', 'R', 'E', 'G', 'I', 'N'],
+  ['N', 'A', 'J', 'A', 'R', 'A', 'C', 'L', 'E', 'A', 'N', 'E', 'M', 'O', 'A'],
+  ['A', 'R', 'E', 'D', 'I', 'L', 'E', 'U', 'Z', 'A', 'T', 'I', 'C', 'L', 'L'],
+  ['J', 'I', 'Z', 'E', 'Z', 'I', 'N', 'H', 'O', 'N', 'I', 'A', 'N', 'A', 'D'],
+  ['A', 'O', 'R', 'O', 'Z', 'A', 'N', 'G', 'E', 'L', 'A', 'N', 'E', 'N', 'O'],
+  ['R', 'L', 'O', 'N', 'A', 'L', 'D', 'O', 'T', 'I', 'C', 'E', 'M', 'D', 'R'],
+  ['A', 'A', 'N', 'A', 'M', 'A', 'R', 'I', 'O', 'C', 'I', 'A', 'A', 'A', 'E'],
+  ['T', 'N', 'A', 'L', 'D', 'O', 'R', 'O', 'N', 'A', 'L', 'D', 'R', 'R', 'G'],
+  ['I', 'D', 'L', 'D', 'O', 'Z', 'E', 'L', 'A', 'N', 'E', 'I', 'I', 'A', 'I'],
+  ['C', 'A', 'D', 'O', 'R', 'E', 'G', 'A', 'N', 'E', 'A', 'L', 'O', 'J', 'N'],
+  ['I', 'R', 'O', 'S', 'A', 'Z', 'I', 'N', 'D', 'J', 'N', 'E', 'L', 'A', 'A'],
+  ['A', 'O', 'R', 'O', 'N', 'A', 'N', 'D', 'A', 'A', 'E', 'U', 'A', 'R', 'L'],
+  ['N', 'N', 'O', 'S', 'A', 'R', 'A', 'R', 'J', 'R', 'Z', 'Z', 'N', 'A', 'D'],
+  ['E', 'A', 'S', 'S', 'I', 'S', 'L', 'O', 'A', 'A', 'A', 'A', 'D', 'N', 'O'],
+  ['A', 'L', 'D', 'O', 'T', 'I', 'D', 'O', 'R', 'N', 'A', 'L', 'O', 'A', 'M']
+];
+
+let score = 0;
+let selectedLetters = [];
+let foundWords = new Set();
+
+function initializeGame() {
+  const wordGrid = document.getElementById('word-grid');
+  const wordList = document.getElementById('word-list');
+
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      const letter = document.createElement('div');
+      letter.className = 'letter';
+      letter.textContent = grid[i][j];
+      letter.dataset.row = i;
+      letter.dataset.col = j;
+      letter.addEventListener('mousedown', startSelection);
+      letter.addEventListener('mouseover', continueSelection);
+      letter.addEventListener('mouseup', endSelection);
+      letter.addEventListener('touchstart', startSelection);
+      letter.addEventListener('touchmove', continueTouchSelection);
+      letter.addEventListener('touchend', endSelection);
+      wordGrid.appendChild(letter);
+    }
+  }
+
+  words.forEach(word => {
+    const wordItem = document.createElement('div');
+    wordItem.className = 'word-item';
+    wordItem.textContent = word;
+    wordList.appendChild(wordItem);
+  });
+
+  document.addEventListener('mouseup', endSelection);
+  document.addEventListener('touchend', endSelection);
+}
+
+function startSelection(event) {
+  event.preventDefault();
+  selectedLetters = [this];
+  this.classList.add('selected');
+}
+
+function continueSelection(event) {
+  if (event.buttons !== 1) return;
+  if (!selectedLetters.includes(this)) {
+    selectedLetters.push(this);
+    this.classList.add('selected');
+  }
+}
+
+function continueTouchSelection(event) {
+  event.preventDefault();
+  const touch = event.touches[0];
+  const letter = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (letter && letter.classList.contains('letter') && !selectedLetters.includes(letter)) {
+    selectedLetters.push(letter);
+    letter.classList.add('selected');
+  }
+}
+
+function endSelection() {
+  const word = selectedLetters.map(letter => letter.textContent).join('');
+  const reversedWord = word.split('').reverse().join('');
+
+  if (words.includes(word) || words.includes(reversedWord)) {
+    const foundWord = words.includes(word) ? word : reversedWord;
+    if (!foundWords.has(foundWord)) {
+      foundWords.add(foundWord);
+      selectedLetters.forEach(letter => letter.classList.add('correct'));
+      updateScore();
+      updateWordList(foundWord);
+    }
+  }
+
+  selectedLetters.forEach(letter => letter.classList.remove('selected'));
+  selectedLetters = [];
+}
+
+function updateScore() {
+  score++;
+  document.getElementById('score-value').textContent = score;
+}
+
+function updateWordList(word) {
+  const wordItems = document.querySelectorAll('.word-item');
+  wordItems.forEach(item => {
+    if (item.textContent === word) {
+      item.classList.add('found');
+    }
+  });
+}
+
+initializeGame();
+</script>
+</body>
+</html>

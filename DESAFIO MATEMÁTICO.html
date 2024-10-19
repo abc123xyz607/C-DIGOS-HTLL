@@ -1,0 +1,293 @@
+<html><head><base href="https://www.multiplytablegame.com/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo da Tabuada - 4 Operações</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+  }
+  .game-container {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  .button-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+  }
+  .operation-button {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 0 #999;
+  }
+  .operation-button:hover {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #999;
+  }
+  .operation-button:active {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+  .operation-button.selected {
+    background-color: #4CAF50;
+    color: white;
+  }
+  #question {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  #answer {
+    font-size: 18px;
+    padding: 5px;
+    width: 100px;
+  }
+  #submit {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin-top: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 0 #45a049;
+  }
+  #submit:hover {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #45a049;
+  }
+  #submit:active {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+  #result {
+    font-size: 18px;
+    margin-top: 20px;
+  }
+  .score-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 20px;
+  }
+  .player-score {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .correct {
+    color: green;
+  }
+  #start-button {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin-top: 20px;
+    background-color: #9370DB;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 0 #6A5ACD;
+  }
+  #start-button:hover {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #6A5ACD;
+  }
+  #start-button:active {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+  #next-player {
+    font-size: 18px;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  #selected-operation {
+    font-size: 20px;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  #continue-button {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin-top: 20px;
+    background-color: #FF9800;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 0 #F57C00;
+    display: none;
+  }
+  #continue-button:hover {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #F57C00;
+  }
+  #continue-button:active {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+</style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="button-container">
+      <button class="operation-button" data-operation="+" style="background-color: #FF9800;">+</button>
+      <button class="operation-button" data-operation="-" style="background-color: #2196F3;">-</button>
+      <button class="operation-button" data-operation="*" style="background-color: #E91E63;">×</button>
+      <button class="operation-button" data-operation="/" style="background-color: #9C27B0;">÷</button>
+    </div>
+    <div id="selected-operation"></div>
+    <div id="question"></div>
+    <input type="number" id="answer" placeholder="Sua resposta">
+    <button id="submit">Enviar</button>
+    <div id="result"></div>
+    <div class="score-container">
+      <div class="player-score" id="player1-score">Jogador 1: 0</div>
+      <div class="player-score" id="player2-score">Jogador 2: 0</div>
+    </div>
+    <button id="start-button">Iniciar Jogo</button>
+    <button id="continue-button">Continuar</button>
+    <div id="next-player"></div>
+  </div>
+
+  <script>
+    const operationButtons = document.querySelectorAll('.operation-button');
+    const questionEl = document.getElementById('question');
+    const answerEl = document.getElementById('answer');
+    const submitBtn = document.getElementById('submit');
+    const resultEl = document.getElementById('result');
+    const player1ScoreEl = document.getElementById('player1-score');
+    const player2ScoreEl = document.getElementById('player2-score');
+    const startButton = document.getElementById('start-button');
+    const continueButton = document.getElementById('continue-button');
+    const nextPlayerEl = document.getElementById('next-player');
+    const selectedOperationEl = document.getElementById('selected-operation');
+
+    let currentOperation = '+';
+    let currentQuestion = {};
+    let scores = [0, 0];
+    let currentPlayer = 0;
+    let gameStarted = false;
+
+    function generateQuestion() {
+      let num1 = Math.floor(Math.random() * 10) + 1;
+      let num2 = Math.floor(Math.random() * 10) + 1;
+
+      if (currentOperation === '/') {
+        num1 = num2 * (Math.floor(Math.random() * 10) + 1);
+      }
+
+      return {
+        num1,
+        num2,
+        operation: currentOperation,
+        answer: calculateAnswer(num1, num2, currentOperation)
+      };
+    }
+
+    function calculateAnswer(num1, num2, operation) {
+      switch (operation) {
+        case '+': return num1 + num2;
+        case '-': return num1 - num2;
+        case '*': return num1 * num2;
+        case '/': return num1 / num2;
+      }
+    }
+
+    function updateQuestion() {
+      currentQuestion = generateQuestion();
+      questionEl.textContent = `${currentQuestion.num1} ${currentQuestion.operation} ${currentQuestion.num2} = ?`;
+    }
+
+    function checkAnswer() {
+      if (!gameStarted) return;
+      const userAnswer = parseFloat(answerEl.value);
+      if (userAnswer === currentQuestion.answer) {
+        resultEl.innerHTML = `<span class="correct">Jogador ${currentPlayer + 1}</span>: ${currentQuestion.num1} ${currentQuestion.operation} ${currentQuestion.num2} = ${userAnswer} (Correto!)`;
+        scores[currentPlayer]++;
+        updateScores();
+      } else {
+        resultEl.textContent = `Incorreto. A resposta correta é ${currentQuestion.answer}.`;
+      }
+      currentPlayer = 1 - currentPlayer; // Switch player
+      answerEl.value = '';
+      continueButton.style.display = 'inline-block';
+      submitBtn.style.display = 'none';
+      answerEl.style.display = 'none';
+      updateNextPlayer();
+    }
+
+    function updateScores() {
+      player1ScoreEl.textContent = `Jogador 1: ${scores[0]}`;
+      player2ScoreEl.textContent = `Jogador 2: ${scores[1]}`;
+    }
+
+    function updateNextPlayer() {
+      nextPlayerEl.textContent = `Vez do Jogador ${currentPlayer + 1}`;
+    }
+
+    operationButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        if (!gameStarted) return;
+        currentOperation = button.dataset.operation;
+        operationButtons.forEach(btn => btn.classList.remove('selected'));
+        button.classList.add('selected');
+        selectedOperationEl.textContent = `Operação selecionada: ${currentOperation}`;
+        updateQuestion();
+      });
+    });
+
+    submitBtn.addEventListener('click', checkAnswer);
+
+    answerEl.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        checkAnswer();
+      }
+    });
+
+    startButton.addEventListener('click', () => {
+      gameStarted = true;
+      scores = [0, 0];
+      currentPlayer = 0;
+      updateScores();
+      updateQuestion();
+      updateNextPlayer();
+      startButton.style.display = 'none';
+      questionEl.style.display = 'block';
+      answerEl.style.display = 'inline-block';
+      submitBtn.style.display = 'inline-block';
+      selectedOperationEl.textContent = `Operação selecionada: ${currentOperation}`;
+    });
+
+    continueButton.addEventListener('click', () => {
+      updateQuestion();
+      continueButton.style.display = 'none';
+      submitBtn.style.display = 'inline-block';
+      answerEl.style.display = 'inline-block';
+    });
+
+    // Inicialmente, esconde os elementos do jogo
+    questionEl.style.display = 'none';
+    answerEl.style.display = 'none';
+    submitBtn.style.display = 'none';
+  </script>
+</body>
+</html>

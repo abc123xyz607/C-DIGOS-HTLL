@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jogo do Gato</title>
+</head>
+<body>
+    <img src="IMAGEM/gato.png.webp" id="gato" onclick="playMeow()" alt="Gato" style="cursor: pointer;">
+    <audio id="meow" src="AUDIO/meow.mp3" preload="auto"></audio>
+    <script>
+        function playMeow() {
+            var meow = document.getElementById("meow");
+            meow.play();
+        }
+    </script>
+</body>
+</html>

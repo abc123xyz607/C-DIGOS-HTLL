@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Adivinhação de Palavras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #game {
+            width: 80vw;
+            max-width: 600px;
+            background-color: #fff;
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .player {
+            margin-bottom: 20px;
+        }
+        .feedback {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #d9534f;
+        }
+        #scoreboard {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        #restart {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game">
+        <div id="player1" class="player">
+            <h2>Jogador 1</h2>
+            <div id="hints1"></div>
+            <input type="text" id="guess1" placeholder="Adivinhe a palavra">
+            <button id="submit1">Enviar Adivinhação</button>
+            <div id="feedback1" class="feedback"></div>
+        </div>
+
+        <div id="player2" class="player">
+            <h2>Jogador 2</h2>
+            <div id="hints2"></div>
+            <input type="text" id="guess2" placeholder="Adivinhe a palavra">
+            <button id="submit2">Enviar Adivinhação</button>
+            <div id="feedback2" class="feedback"></div>
+        </div>
+
+        <div id="scoreboard">Jogador 1: 0 | Jogador 2: 0</div>
+        <div id="message"></div>
+        <button id="restart">Reiniciar Jogo</button>
+    </div>
+
+    <script>
+        const words = [
+            { word: "maçã", hints: ["É uma fruta", "É vermelha ou verde", "Tem sementes", "É doce", "Usado para fazer torta"] },
+            { word: "carro", hints: ["É um meio de transporte", "Tem quatro rodas", "Precisa de gasolina", "Usado para dirigir", "Pode ser esportivo"] },
+            { word: "gato", hints: ["É um animal de estimação", "Miau", "É felino", "Adora dormir", "Caza ratos"] },
+            { word: "computador", hints: ["Usado para trabalhar", "Tem tela", "Pode acessar a internet", "Usado para jogos", "Tem teclado"] },
+            { word: "livro", hints: ["Contém páginas", "Pode ser de ficção ou não", "Lido para aprender", "Tem capas", "Pode ter ilustrações"] }
+        ];
+
+        let currentRound = 0;
+        let player1Score = 0;
+        let player2Score = 0;
+        let currentWord1, currentWord2;
+
+        function resetGame() {
+            currentRound = 0;
+            player1Score = 0;
+            player2Score = 0;
+            document.getElementById('restart').style.display = 'none';
+            updateScoreboard();
+            startNewRound();
+        }
+
+        function startNewRound() {
+            currentWord1 = words[Math.floor(Math.random() * words.length)];
+            currentWord2 = words[Math.floor(Math.random() * words.length)];
+
+            document.getElementById('hints1').innerText = currentWord1.hints.join('\n');
+            document.getElementById('hints2').innerText = currentWord2.hints.join('\n');
+            document.getElementById('guess1').value = '';
+            document.getElementById('guess2').value = '';
+            document.getElementById('feedback1').innerText = '';
+            document.getElementById('feedback2').innerText = '';
+            document.getElementById('message').innerText = '';
+        }
+
+        function updateScoreboard() {
+            document.getElementById('scoreboard').innerText = `Jogador 1: ${player1Score} | Jogador 2: ${player2Score}`;
+        }
+
+        document.getElementById('submit1').addEventListener('click', () => {
+            const guess = document.getElementById('guess1').value.toLowerCase();
+            if (guess === currentWord1.word) {
+                player1Score += 10;
+                document.getElementById('feedback1').innerText = "Você acertou!";
+                currentRound++;
+                checkEndGame();
+                setTimeout(startNewRound, 2000);
+            } else {
+                document.getElementById('feedback1').innerText = "Tente novamente!";
+            }
+        });
+
+        document.getElementById('submit2').addEventListener('click', () => {
+            const guess = document.getElementById('guess2').value.toLowerCase();
+            if (guess === currentWord2.word) {
+                player2Score += 10;
+                document.getElementById('feedback2').innerText = "Você acertou!";
+                currentRound++;
+                checkEndGame();
+                setTimeout(startNewRound, 2000);
+            } else {
+                document.getElementById('feedback2').innerText = "Tente novamente!";
+            }
+        });
+
+        function checkEndGame() {
+            if (currentRound >= 5) {
+                const winner = player1Score > player2Score ? "Jogador 1" : "Jogador 2";
+                document.getElementById('message').innerText = `Fim do Jogo! ${winner} é o vencedor!`;
+                document.getElementById('restart').style.display = 'block';
+            }
+            updateScoreboard();
+        }
+
+        document.getElementById('restart').addEventListener('click', resetGame);
+
+        resetGame();
+    </script>
+
+</body>
+</html>

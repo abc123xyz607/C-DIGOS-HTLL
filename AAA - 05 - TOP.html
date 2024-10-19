@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo do Gato</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #gato {
+            max-width: 100%;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        #gato.clicked {
+            animation: clickEffect 0.3s ease;
+        }
+        @keyframes clickEffect {
+            0% { transform: scale(1) translateX(0); }
+            25% { transform: scale(0.95) translateX(-5px); }
+            50% { transform: scale(0.9) translateX(5px); }
+            75% { transform: scale(0.95) translateX(-2px); }
+            100% { transform: scale(1) translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <img src="IMAGEM/gato.png.webp" id="gato" alt="Gato" onclick="playMeowAndAnimate()">
+    <audio id="meow" preload="auto">
+        <source src="AUDIO/meow.mp3" type="audio/mpeg">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+    <script>
+        function playMeowAndAnimate() {
+            var meow = document.getElementById("meow");
+            var gato = document.getElementById("gato");
+            
+            meow.play().catch(function(error) {
+                console.log("Erro ao reproduzir áudio: ", error);
+                alert("Não foi possível reproduzir o áudio. Por favor, toque na tela para ativar o som.");
+            });
+            
+            gato.classList.add('clicked');
+            setTimeout(() => {
+                gato.classList.remove('clicked');
+            }, 300);
+        }
+    </script>
+</body>
+</html>

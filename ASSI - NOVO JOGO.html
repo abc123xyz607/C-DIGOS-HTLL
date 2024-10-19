@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Jogo da Velha</title>
+	<style>
+		table {
+			border-collapse: collapse;
+			width: 300px;
+			height: 300px;
+			text-align: center;
+			font-size: 50px;
+		}
+
+		td {
+			border: 1px solid black;
+			width: 100px;
+			height: 100px;
+			cursor: pointer;
+		}
+
+		.score-table {
+			border-collapse: collapse;
+			width: 100%;
+			margin-top: 20px;
+		}
+
+		.score-table th, .score-table td {
+			padding: 8px;
+			text-align: left;
+			border-bottom: 1px solid #ddd;
+		}
+
+		.score-table th {
+			background-color: #f2f2f2;
+		}
+	</style>
+</head>
+<body>
+	<h1>Jogo da Velha</h1>
+	
+	
+<table id="game-board">
+		<tr>
+			<td onclick="makeMove(0, 0)"></td>
+			<td onclick="makeMove(0, 1)"></td>
+			<td onclick="makeMove(0, 2)"></td>
+		</tr>
+		<tr>
+			<td onclick="makeMove(1, 0)"></td>
+			<td onclick="makeMove(1, 1)"></td>
+			<td onclick="makeMove(1, 2)"></td>
+		</tr>
+		<tr>
+			<td onclick="makeMove(2, 0)"></td>
+			<td onclick="makeMove(2, 1)"></td>
+			<td onclick="makeMove(2, 2)"></td>
+		</tr>
+	</table>
+
+	<table class="score-table">
+		<tr>
+			<th>Jogador 1</th>
+			<th>Jogador 2</th>
+		</tr>
+		<tr>
+			<td id="player1-score">0</td>
+			<td id="player2-score">0</td>
+		</tr>
+	</table>
+
+	<script>
+		let gameBoard = [
+			['', '', ''],
+			['', '', ''],
+			['', '', '']
+		];
+		let currentPlayer = 'X';
+		let player1Score = 0;
+		let player2Score = 0;
+
+		function makeMove(row, col) {
+			if (gameBoard[row][col] === '') {
+				gameBoard[row][col] = currentPlayer;
+				document.getElementById(`game-board`).rows[row].cells[col].textContent = currentPlayer;
+				checkWin();
+				switchPlayer();
+			}
+		}
+
+		function switchPlayer() {
+			currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+		}
+
+		function checkWin() {
+			// Verificar linhas
+			for (let i = 0; i < 3; i++) {
+				if (gameBoard[i][0] === gameBoard[i][1] && gameBoard[i][1] === gameBoard[i][2] && gameBoard[i][0] !== '') {
+					declareWinner(gameBoard[i][0]);
+					return;
+				}
+			}
+
+			// Verificar colunas
+			for (let i = 0; i < 3; i++) {
+				if (gameBoard[0][i] === gameBoard[1][i] && gameBoard[1][i] === gameBoard[2][i] && gameBoard[0][i] !== '') {
+					declareWinner(gameBoard[0][i]);
+					return;
+				}
+			}
+
+			// Verificar diagonais
+			if (gameBoard[0][0] === gameBoard[1][1] && gameBoard[1][1] === gameBoard[2][2] && gameBoard[0][0] !== '') {
+				declareWinner(gameBoard[0][0]);
+				return;
+			}
+			if (gameBoard[0][2] === gameBoard[1][1] && gameBoard[1][1] === gameBoard[2][0] && gameBoard[0][2] !== '') {
+				declareWinner(gameBoard[0][2]);
+				return;
+			}
+
+			// Verificar empate
+			if (isBoardFull()) {
+				declareWinner('Empate');
+			}
+		}
+
+		function isBoardFull() {
+			for (let i = 0; i < 3; i++) {
+				for (let j = 0; j < 3; j++) {
+					if (gameBoard[i][j] === '') {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		function declareWinner(winner) {
+			if (winner === 'X') {
+				player1Score++;
+			} else if (winner === 'O') {
+				player2Score++;
+			}
+
+			document.getElementById("player1-score").textContent = player1Score;
+			document.getElementById("player2-score").textContent = player2Score;
+
+			alert(`O vencedor é o jogador ${winner}!`);
+			resetGame();
+		}
+
+		function resetGame() {
+			gameBoard = [
+				['', '', ''],
+				['', '', ''],
+				['', '', '']
+			];
+			currentPlayer = 'X';
+			updateGameBoard();
+		}
+
+		function updateGameBoard() {
+			for (let i = 0; i < 3; i++) {
+				for (let j = 0; j < 3; j++) {
+					document.getElementById(`game-board`).rows[i].cells[j].textContent = gameBoard[i][j];
+				}
+			}
+		}
+	</script>
+</body>
+</html>

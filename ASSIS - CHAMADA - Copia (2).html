@@ -1,0 +1,454 @@
+<html><head><base href="https://frequencia-online.com/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frequência Online</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+        .button:hover {background-color: #3e8e41}
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+        .red {
+            background-color: #f44336;
+        }
+        .red:hover {
+            background-color: #da190b;
+        }
+        .blue {
+            background-color: #008CBA;
+        }
+        .blue:hover {
+            background-color: #0077a3;
+        }
+        .purple {
+            background-color: #9C27B0;
+        }
+        .purple:hover {
+            background-color: #7B1FA2;
+        }
+        .green {
+            background-color: #4CAF50;
+        }
+        .green:hover {
+            background-color: #45a049;
+        }
+        #studentList {
+            margin-top: 20px;
+        }
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .student-name {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .attendance-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .attendance-button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .present {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .absent {
+            background-color: #f44336;
+            color: white;
+        }
+        .justified {
+            background-color: #FFC107;
+            color: black;
+        }
+        .attendance-status {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .present-highlight {
+            background-color: rgba(76,175,80,0.2);
+        }
+        .absent-highlight {
+            background-color: rgba(244,67,54,0.2);
+        }
+        .justified-highlight {
+            background-color: rgba(255,193,7,0.2);
+        }
+        @media (max-width: 600px) {
+            .student-item {
+                flex-wrap: wrap;
+            }
+            .student-name {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .attendance-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Frequência Online</h1>
+        <div class="form-group">
+            <label for="date">Data:</label>
+            <input type="date" id="date" required>
+        </div>
+        <div class="form-group">
+            <label for="discipline">Disciplina:</label>
+            <select id="discipline" required>
+                <option value="">Selecione uma disciplina</option>
+                <option value="portugues">Português</option>
+                <option value="lingua_estrangeira">Língua Estrangeira</option>
+                <option value="matematica">Matemática</option>
+                <option value="historia">História</option>
+                <option value="geografia">Geografia</option>
+                <option value="ciencias">Ciências</option>
+                <option value="arte_educacao">Arte Educação</option>
+                <option value="ensino_religioso">Ensino Religioso</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="class">Turma:</label>
+            <select id="class" required>
+                <option value="">Selecione uma turma</option>
+                <option value="6A">6º Ano - A</option>
+                <option value="6B">6º Ano - B</option>
+                <option value="6C">6º Ano - C</option>
+                <option value="6D">6º Ano - D</option>
+                <option value="7A">7º Ano - A</option>
+                <option value="7B">7º Ano - B</option>
+                <option value="7C">7º Ano - C</option>
+                <option value="7D">7º Ano - D</option>
+                <option value="8A">8º Ano - A</option>
+                <option value="8B">8º Ano - B</option>
+                <option value="8C">8º Ano - C</option>
+                <option value="8D">8º Ano - D</option>
+                <option value="9A">9º Ano - A</option>
+                <option value="9B">9º Ano - B</option>
+                <option value="9C">9º Ano - C</option>
+                <option value="9D">9º Ano - D</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="studentNames">Lista de Alunos:</label>
+            <textarea id="studentNames" rows="10" cols="50" placeholder="Cole aqui a relação nominal dos alunos"></textarea>
+            <button class="button green" id="saveStudents">Salvar Lista de Alunos</button>
+        </div>
+        <div class="form-group">
+            <label for="deleteDate">Data para deletar histórico:</label>
+            <input type="date" id="deleteDate">
+            <div class="form-group">
+                <label for="deleteType">Tipo de Deleção:</label>
+                <select id="deleteType">
+                    <option value="day">Dia</option>
+                    <option value="month">Mês</option>
+                    <option value="year">Ano</option>
+                </select>
+            </div>
+            <button class="button red" id="deleteHistory">Deletar Histórico por Data</button>
+        </div>
+        <div class="form-group">
+            <label for="searchDate">Data para buscar histórico:</label>
+            <input type="date" id="searchDate">
+            <div class="form-group">
+                <label for="searchType">Tipo de Busca:</label>
+                <select id="searchType">
+                    <option value="day">Dia</option>
+                    <option value="month">Mês</option>
+                    <option value="year">Ano</option>
+                </select>
+            </div>
+            <button class="button purple" id="searchHistory">Buscar Histórico por Data</button>
+        </div>
+        <div id="studentList"></div>
+        <button class="button green" id="confirmAttendance">Confirmar Chamada</button>
+        <button class="button blue" id="newAttendance">Nova Chamada</button>
+        <button class="button purple" id="exportExcel">Exportar para Excel</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            let students = [];
+
+            // Load saved student list
+            if (localStorage.getItem('students')) {
+                students = JSON.parse(localStorage.getItem('students'));
+                $('#studentNames').val(students.join('\n'));
+                renderStudentList();
+            }
+
+            // Save student list
+            $('#saveStudents').on('click', function() {
+                students = $('#studentNames').val().split('\n').filter(name => name.trim() !== '');
+                localStorage.setItem('students', JSON.stringify(students));
+                renderStudentList();
+                alert('Lista de alunos salva com sucesso!');
+            });
+
+            // Render student list with attendance buttons
+            function renderStudentList() {
+                let html = '';
+                students.forEach(student => {
+                    html += `
+                        <div class="student-item">
+                            <span class="student-name">${student}</span>
+                            <div class="attendance-buttons">
+                                <button class="attendance-button present" data-status="present">Presente</button>
+                                <button class="attendance-button absent" data-status="absent">Falta</button>
+                                <button class="attendance-button justified" data-status="justified">Justificada</button>
+                            </div>
+                            <span class="attendance-status">Presença</span>
+                        </div>
+                    `;
+                });
+                $('#studentList').html(html);
+            }
+
+            // Handle attendance buttons
+            $(document).on('click', '.attendance-button', function() {
+                let button = $(this);
+                let studentItem = button.closest('.student-item');
+                let statusText = studentItem.find('.attendance-status');
+                let status = button.data('status');
+
+                studentItem.find('.attendance-button').removeClass('active');
+                button.addClass('active');
+
+                switch(status) {
+                    case 'present':
+                        statusText.text('Presença');
+                        studentItem.removeClass('absent-highlight justified-highlight').addClass('present-highlight');
+                        break;
+                    case 'absent':
+                        statusText.text('Falta');
+                        studentItem.removeClass('present-highlight justified-highlight').addClass('absent-highlight');
+                        break;
+                    case 'justified':
+                        statusText.text('Falta Justificada');
+                        studentItem.removeClass('present-highlight absent-highlight').addClass('justified-highlight');
+                        break;
+                }
+            });
+
+            // Confirmar chamada
+            $('#confirmAttendance').on('click', function() {
+                let date = $('#date').val();
+                let discipline = $('#discipline').val();
+                let className = $('#class').val();
+
+                if (!date || !discipline || !className) {
+                    alert('Por favor, preencha todos os campos antes de confirmar a chamada.');
+                    return;
+                }
+
+                let attendance = [];
+                $('.student-item').each(function() {
+                    let name = $(this).find('.student-name').text();
+                    let status = $(this).find('.attendance-button.active').data('status') || 'present';
+                    attendance.push({name, status});
+                });
+
+                let attendanceRecord = {date, discipline, className, attendance};
+                let history = JSON.parse(localStorage.getItem('attendanceHistory') || '[]');
+                history.push(attendanceRecord);
+                localStorage.setItem('attendanceHistory', JSON.stringify(history));
+
+                alert('Chamada registrada com sucesso!');
+            });
+
+            // Nova chamada
+            $('#newAttendance').on('click', function() {
+                $('#date').val('');
+                $('#discipline').val('');
+                $('#class').val('');
+                $('.attendance-button').removeClass('active');
+                $('.attendance-status').text('Presença');
+                $('.student-item').removeClass('present-highlight absent-highlight justified-highlight');
+            });
+
+            // Deletar histórico por data
+            $('#deleteHistory').on('click', function() {
+                let deleteDate = $('#deleteDate').val();
+                let deleteType = $('#deleteType').val();
+                if (!deleteDate) {
+                    alert('Por favor, selecione uma data para deletar o histórico.');
+                    return;
+                }
+
+                let confirmMessage;
+                switch (deleteType) {
+                    case 'day':
+                        confirmMessage = `Tem certeza que deseja deletar o histórico de chamadas para o dia ${formatDate(deleteDate)}?`;
+                        break;
+                    case 'month':
+                        confirmMessage = `Tem certeza que deseja deletar o histórico de chamadas para o mês ${deleteDate.slice(5, 7)}/${deleteDate.slice(0, 4)}?`;
+                        break;
+                    case 'year':
+                        confirmMessage = `Tem certeza que deseja deletar o histórico de chamadas para o ano ${deleteDate.slice(0, 4)}?`;
+                        break;
+                }
+
+                if (confirm(confirmMessage)) {
+                    let history = JSON.parse(localStorage.getItem('attendanceHistory') || '[]');
+                    let newHistory;
+
+                    switch (deleteType) {
+                        case 'day':
+                            newHistory = history.filter(record => record.date !== deleteDate);
+                            break;
+                        case 'month':
+                            newHistory = history.filter(record => record.date.slice(0, 7) !== deleteDate.slice(0, 7));
+                            break;
+                        case 'year':
+                            newHistory = history.filter(record => record.date.slice(0, 4) !== deleteDate.slice(0, 4));
+                            break;
+                    }
+
+                    localStorage.setItem('attendanceHistory', JSON.stringify(newHistory));
+                    alert(`Histórico de chamadas ${deleteType === 'day' ? 'do dia' : deleteType === 'month' ? 'do mês' : 'do ano'} deletado com sucesso!`);
+                }
+            });
+
+            // Buscar histórico
+            $('#searchHistory').on('click', function() {
+                let searchDate = $('#searchDate').val();
+                let searchType = $('#searchType').val();
+                if (!searchDate) {
+                    alert('Por favor, selecione uma data para buscar o histórico.');
+                    return;
+                }
+
+                let history = JSON.parse(localStorage.getItem('attendanceHistory') || '[]');
+                let filteredHistory;
+
+                switch (searchType) {
+                    case 'day':
+                        filteredHistory = history.filter(record => record.date === searchDate);
+                        break;
+                    case 'month':
+                        filteredHistory = history.filter(record => record.date.slice(0, 7) === searchDate.slice(0, 7));
+                        break;
+                    case 'year':
+                        filteredHistory = history.filter(record => record.date.slice(0, 4) === searchDate.slice(0, 4));
+                        break;
+                }
+
+                let html = `<h2>Histórico de Chamadas - ${formatDate(searchDate)} (${searchType === 'day' ? 'Dia' : searchType === 'month' ? 'Mês' : 'Ano'})</h2>`;
+                if (filteredHistory.length === 0) {
+                    html += '<p>Nenhum registro encontrado para este período.</p>';
+                } else {
+                    filteredHistory.forEach(record => {
+                        html += `
+                            <div>
+                                <h3>${formatDate(record.date)} - ${record.discipline} - ${record.className}</h3>
+                                <ul>
+                                    ${record.attendance.map(student => `
+                                        <li class="${student.status}-highlight">
+                                            ${student.name}: ${student.status === 'present' ? 'Presente' : student.status === 'absent' ? 'Falta' : 'Falta Justificada'}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    });
+                }
+                $('#studentList').html(html);
+            });
+
+            // Format date from YYYY-MM-DD to DD - MM - YYYY
+            function formatDate(dateString) {
+                let [year, month, day] = dateString.split('-');
+                return `${day} - ${month} - ${year}`;
+            }
+
+            // Export to Excel
+            $('#exportExcel').on('click', function() {
+                let history = JSON.parse(localStorage.getItem('attendanceHistory') || '[]');
+                let data = [['Nome', 'Presenças', 'Faltas', 'Faltas Justificadas']];
+
+                let studentSummary = {};
+                students.forEach(student => {
+                    studentSummary[student] = {present: 0, absent: 0, justified: 0};
+                });
+
+                history.forEach(record => {
+                    record.attendance.forEach(att => {
+                        if (studentSummary[att.name]) {
+                            studentSummary[att.name][att.status]++;
+                        }
+                    });
+                });
+
+                Object.entries(studentSummary).forEach(([name, summary]) => {
+                    data.push([name, summary.present, summary.absent, summary.justified]);
+                });
+
+                let ws = XLSX.utils.aoa_to_sheet(data);
+                let wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Frequência");
+                XLSX.writeFile(wb, "frequencia.xlsx");
+            });
+        });
+    </script>
+</body>
+</html>
